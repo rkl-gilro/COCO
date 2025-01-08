@@ -15,7 +15,20 @@ else
         'control_purple_outdoor_ab.mat','control_teal_outdoor_ab.mat'});
 end
 
+colors_lab_ls = [54.5682  -4.1034   15.5010
+   54.5682   25.7018    5.3570
+   54.5682   14.4935  -21.5861
+   54.5682   -9.6106  -11.5119];
 
+colors_rgb_ls = [0.2331    0.2311    0.1376;
+    0.4340    0.1623    0.1963;
+    0.2630    0.1972    0.3911;
+    0.1264    0.2485    0.3046];
+% Run main_computeIlluminatsCompetitors + LocalContext_candidates
+% [yellow_candidates_rgb(:, 4)'
+% red_candidates_rgb(:, 4)'
+% blue_candidates_rgb(:, 4)'
+% green_candidates_rgb(:, 4)']
 
 colors_ill_clockwise = {'Yellow', 'Red','Blue', 'Green'};
 colors_ill_anticlockwise = {'Green', 'Yellow', 'Red','Blue'};
@@ -70,7 +83,7 @@ figure;h = daviolinplot(data1,'colors',c,'box',3,...
 'xtlabels', condition_names);
 ylim([0 1.2])
 xl = xlim; xlim([xl(1)-0.1, xl(2)+0.2]);
-set(gca, 'FontSize', 20, 'fontname','Times New Roman');
+set(gca, 'FontSize', 20, 'fontname','L M Roman10');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -81,11 +94,29 @@ for i = 1:length(cci_surround)
     aux_part = size(aux, 1);
     aux_ill = [repmat("Blue",aux_part,1);repmat("Yellow",aux_part,1);...
         repmat("Green",aux_part,1);repmat("Red",aux_part,1)];
+    
 
     cci_all = [cci_all; aux(:)];
     illuminants_all = [illuminants_all; aux_ill];
 
     experiment_all = [experiment_all; repmat(local{i},length(aux(:)),1)];
+    
+    reflected = repmat(colors_rgb_ls(i, :), size(experiments_ill,1), 1) ...
+        .* experiments_ill;
+    
+    reflected_lab = rgb2lab(reflected, 'ColorSpace','linear-rgb',...
+        'WhitePoint',[1 1 1]);
+    
+    reflectance_lab = rgb2lab(colors_rgb_ls(i, :), 'ColorSpace',...
+        'linear-rgb','WhitePoint',[1 1 1]);
+    
+    deltaerror = deltaE00(repmat(reflectance_lab, ...
+        size(reflected_lab,1), 1)', reflected_lab');
+    aux_shift = [repmat(deltaerror(1),aux_part,1);...
+        repmat(deltaerror(2),aux_part,1);...
+        repmat(deltaerror(3),aux_part,1);repmat(deltaerror(4),aux_part,1)];
+
+    colorshifts_all = [colorshifts_all;aux_shift];
 
     aux_partcell = repmat(aux2, 1,size(aux,2));
     participants_all = [participants_all; aux_partcell(:)];
@@ -116,10 +147,12 @@ for i = 1:length(cci_surround)
 end
 
 tablenames = ...
-    {'CCI', 'Participant', 'LocalSurround', 'Illuminant', 'Direction'};
+    {'CCI', 'Participant', 'LocalSurround', 'Illuminant', 'Direction',...
+    'ColorShift'};
 tbl = table(cci_all, ...
     participants_all, experiment_all, ...
-    illuminants_all, neighbor_all,'VariableNames', tablenames);
+    illuminants_all, neighbor_all,colorshifts_all,...
+    'VariableNames', tablenames);
 
 tbl.LocalSurround = nominal(tbl.LocalSurround);
 tbl.Illuminant    = nominal(tbl.Illuminant);
@@ -200,4 +233,4 @@ figure;h2 = daviolinplot(data2,'colors',c2,'box',3,...
 'xtlabels', condition_names2);
 ylim([0 1.2])
 xl = xlim; xlim([xl(1)-0.1, xl(2)+0.2]);
-set(gca, 'FontSize', 20, 'fontname','Times New Roman');
+set(gca, 'FontSize', 20, 'fontname','L M Roman10');

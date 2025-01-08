@@ -64,7 +64,7 @@ figure;h = daviolinplot(data1,'colors',c,'box',3,...
 'xtlabels', condition_names);
 ylim([0 1.2])
 xl = xlim; xlim([xl(1)-0.1, xl(2)+0.2]);
-set(gca, 'FontSize', 20, 'fontname','Times New Roman');
+set(gca, 'FontSize', 20, 'fontname','L M Roman10');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -199,4 +199,4 @@ figure;h2 = daviolinplot(data2,'colors',c2,'box',3,...
 'xtlabels', condition_names2);
 ylim([0 1.2])
 xl = xlim; xlim([xl(1)-0.1, xl(2)+0.2]);
-set(gca, 'FontSize', 20, 'fontname','Times New Roman');
+set(gca, 'FontSize', 20, 'fontname','L M Roman10');
