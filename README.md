@@ -4,22 +4,14 @@ The two indoor and outdoor setups in the study focus on investigating colour con
 
 ### Indoor Setup
 - **Environment:** A realistic office-like space with objects such as a desk, chair, bookshelf, plants, and decorative elements.
-- **Illumination:** Single point light source positioned above the observer’s VR actor in the centre of the room.
-- **Scene Interactions:** Observers adapted to five illuminants (neutral, blue, green, yellow, red).
-- **Key Experiment Aspects:**
-    1. The achromatic reference object (a lizard) was placed on a painting under neutral illumination.
-    2. Competing objects of varying colours were introduced under different illuminants.
+- **Illumination:** Single point light source positioned above the observer’s VR actor in the centre of the room. Five illuminants (neutral, blue, green, yellow, red).
 
 
 ### Outdoor Setup
 - **Environment:** A naturalistic forest scene with features like trees, cliffs, a lake, rocks, moss, grass, and flowers.
-- **Illumination:** A directional light paired with a skylight to simulate natural conditions, with adjustments based on illuminant colours.
-- **Scene Interactions:** Observers adapted to five illuminants (neutral, blue, green, yellow, red).
-- **Key Experiment Aspects:**
-    1. A reference lizard was presented on moss near the cliff under neutral illumination.
-    2. Competing lizards were placed around the environment in random locations.
+- **Illumination:** A directional light paired with a skylight to simulate natural conditions, with adjustments based on illuminant colours. Five illuminants (neutral, blue, green, yellow, red).
 
-Both setups utilized VR to maintain experimental control, allowing for precise manipulations of illumination and visual cues while preserving immersive, realistic conditions. The study aimed to understand how mechanisms like local surround, maximum flux, and spatial mean influence color constancy under varied lighting.
+Both setups utilized VR to maintain experimental control, allowing for precise manipulations of illumination and visual cues while preserving immersive, realistic conditions. The study aimed to understand how mechanisms like local surround, maximum flux, and spatial mean influence colour constancy under different coloured illumination.
 
 ## Scene with one light source (indoor and outdoor)
 
@@ -35,15 +27,11 @@ The local surround mechanism examines the influence of immediate surroundings on
 
 **Purpose:**
 
-To test the impact of silencing the local surround cue, which typically stabilizes colour perception through contrasts between the object and its surrounding background.
+To test the impact of silencing the local surround cue on colour constancy performance.
 
 **Implementation:**
 
-The target object (a lizard) was placed on a consistent, self-illuminated leaf with a fixed chromaticity regardless of illuminant colour.
-
-**Effect:**
-
-This manipulation ensured that the immediate background contrast (local surround) remained constant and neutral, isolating the role of this cue in colour constancy.
+The target object (a lizard) was placed in a self-illuminated leaf with a fixed chromaticity regardless of the illuminant colour.
 
 
 
