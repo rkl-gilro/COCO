@@ -19,7 +19,7 @@ yellow  = [0.39, 0.39, Y];
 illuminants = [neutral;blue;yellow;achromatic];
 
 %% Load the white point of the calibration
-xyz_wp = applyCalibration_rgb2xyz(file_calib_unrealstandard, [1 1 1]);
+xyz_wp = applyCalibration_rgb2xyz(file_calib_unrealstandard, [1 1 1])';
 
 %% Convert xyY to Unreal Standard
 load(file_calib_unrealstandard)                                             % load calibration monXYZ & Gammas

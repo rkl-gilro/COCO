@@ -6,21 +6,21 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear
 folder0 = 'Data/LocalSurround/';                                           % folder where the competitors are stored
-folder = 'Data/LocalSurround/Outdoor/Teal/';
+folder = 'Data/LocalSurround/Outdoor/Control_Khaki/';
 subdir = dir(folder);
 
 calibration_file = ['/home/raquel/Documents/repositories/COCO/'...
     'rsrc/results_ColorCharacterization/'...
     'Calibration_UnrealStandard_HTCVive_14_03_2023_LUT_dE.mat'];
 
-num_sessions =   [2 2 3 2 2 1 2 2];%2.*ones(7,1);%
+num_sessions =  [2 2 2 2 3 2 2 2];%2.*ones(7,1);% 
 N = 5;                                                                     % num of competitors
 competitorIndices = nchoosek(1:N, 2);
 lab_111 = 1;                                                               % convert to LAB using default Matlab -1- or the actual calibration -0-
 cci_space = 'ab';                                                          % compute CCI in 'Lab' coordinates or only chromaticity coordinates AB
 C = 200; 
 reflectance_space = 0;
-save_file_name = strcat('teal_outdoor_',cci_space,'.mat');
+save_file_name = strcat('control_khaki_outdoor_',cci_space,'.mat');
 saveFig = [];
 show = 1;                                                                  % set to 1 for plotting figures
 
@@ -262,7 +262,7 @@ for i =1:length(CSVtable)
         
         %% new_rgb_color{i, j} .* experiments_ill(j, :)                    % the match under the colored illuminant
         if lab_111
-            coloredMatch_reflected = ...
+            coloredMatch_reflected{i, j} = ...
                 rgb2lab(new_rgb_color{i, j}.*experiments_ill(j, :), ...
                 'WhitePoint',[1 1 1],...
                 'ColorSpace', 'linear-rgb');
@@ -270,7 +270,7 @@ for i =1:length(CSVtable)
             xyz_aux = XYZ(3, :) .* XYZ(5, :);
             xyz_aux = xyz_aux ./ XYZ(5, 2);
 
-            coloredMatch_reflected = ...
+            coloredMatch_reflected{i, j} = ...
                 xyz2lab(xyz_aux, 'WhitePoint', XYZ(end, :));
         end
         
@@ -294,26 +294,26 @@ for i =1:length(CSVtable)
             
             if strcmp(cci_space, 'Lab')
                 dist_a  = ...
-                    norm(coloredTest_reflected-neutralTest_reflected);
+                 norm(coloredTest_reflected-neutralTest_reflected);
                 dist_a1 = ...
-                    norm(coloredTest_reflected-neutralMatch_reflected);    % the neutral match instead of the test
+                 norm(coloredTest_reflected-neutralMatch_reflected);       % the neutral match instead of the test
                 dist_b  = ...
-                    norm(coloredTest_reflected-coloredMatch_reflected);
+                 norm(coloredTest_reflected-coloredMatch_reflected{i, j});
                 dist_c  = ...
-                    norm(neutralTest_reflected-coloredMatch_reflected);
+                 norm(neutralTest_reflected-coloredMatch_reflected{i, j});
                 dist_c1 = ...
-                    norm(neutralMatch_reflected-coloredMatch_reflected);   % the neutral match instead of the test
+                 norm(neutralMatch_reflected-coloredMatch_reflected{i, j});% the neutral match instead of the test
             else
                 dist_a  = norm(coloredTest_reflected(2:end)...
                     -neutralTest_reflected(2:end));
                 dist_a1 = norm(coloredTest_reflected(2:end)...
                     -neutralMatch_reflected(2:end));                       % the neutral match instead of the test
                 dist_b  = norm(coloredTest_reflected(2:end)...
-                    -coloredMatch_reflected(2:end));
+                    -coloredMatch_reflected{i, j}(2:end));
                 dist_c  = norm(neutralTest_reflected(2:end)...
-                    -coloredMatch_reflected(2:end));
+                    -coloredMatch_reflected{i, j}(2:end));
                 dist_c1 = norm(neutralMatch_reflected(2:end)...
-                    -coloredMatch_reflected(2:end));                       % the neutral match instead of the test
+                    -coloredMatch_reflected{i, j}(2:end));                       % the neutral match instead of the test
             end
 
             CCI.cci(i, j)         = 1 - dist_b/dist_a;
@@ -336,9 +336,9 @@ for i =1:length(CSVtable)
                     'MarkerFaceColor',[.75 .75 .75], ...
                     'Marker', 'square');hold on
 
-                scatter3(coloredMatch_reflected(2), ...
-                    coloredMatch_reflected(3), ...
-                    coloredMatch_reflected(1), C, ...
+                scatter3(coloredMatch_reflected{i, j}(2), ...
+                    coloredMatch_reflected{i, j}(3), ...
+                    coloredMatch_reflected{i, j}(1), C, ...
                     'MarkerEdgeColor','k',...
                     'MarkerFaceColor',experiments_ill(j, :).^.45);hold on
 
@@ -363,5 +363,7 @@ for i =1:length(CSVtable)
 end
 
 %% Save in a mat file %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-save(save_file_name, 'Part_names', 'new_lab_color', 'CCI', 'Rsq1', ...
-    'targetCompetitorFit','logLikelyFit','predictedResponses', 'Matrix');
+save(save_file_name, 'Part_names', 'new_lab_color', ...
+    'coloredMatch_reflected', ...
+    'CCI', 'Rsq1', 'targetCompetitorFit','logLikelyFit',...
+    'predictedResponses', 'Matrix');

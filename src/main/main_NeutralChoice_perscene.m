@@ -1,6 +1,6 @@
 clear
 % close all
-outdoor = 0;
+outdoor = 1;
 relative = 1;
 SZ = 1000;
 competitors_lab =...
@@ -35,7 +35,6 @@ else
         'purple_outdoor_ab.mat','teal_outdoor_ab.mat'});
 
 end
-
 
 
 colors_ill_clockwise = {'Yellow', 'Red','Blue', 'Green'};
@@ -127,4 +126,45 @@ axis([2*(aa(1)-1)+2*(aa(1)-1)-1 2*(aa(end)-1)+2*(aa(end)-1)+2 ...
     -30 20])
 set(gca, 'FontSize', 30, 'FontName','L M Roman10');
 
+figure
+%% Plot the a channel of the MATCH and 
+%% the extrem competitors from the achromatic
+plot([-1 15], competitors_lab(3,2).*ones(2,1), ...
+    'Color',(2.*experiments_ill(end, :)).^.45,'LineStyle','--', ...
+    'LineWidth', 6);hold on
+plot([-1 15], competitors_lab(1,2).*ones(2,1), ...
+    'Color',(2.*experiments_ill(2, :)).^.45,'LineStyle','--', ...
+    'LineWidth', 6);hold on
+plot([-1 15], competitors_lab(end,2).*ones(2,1), ...
+    'Color',(2.*experiments_ill(1, :)).^.45,'LineStyle','--',...
+    'LineWidth', 6);hold on
+
+for i=1:length(cci_control)
+    scatter((2*(i-1) + 2*(i-1)).*ones(length(data1{i}), 1), ...
+       data1{i}(:, 2),SZ, ...
+       'MarkerFaceColor',c(i, :), 'MarkerEdgeColor',[.15 .15 .15]);hold on
+end
+
+for i=1:length(cci_surround)
+    scatter((2*(i-1) + 1 + 2*(i-1)).*ones(length(data2{i}), 1), ...
+       data2{i}(:, 2),SZ, ...
+       'MarkerFaceColor',c(i, :), 'MarkerEdgeColor',[.5 .5 .5]);hold on
+end
+
+for i=1:length(cci_control)
+    for j=1:size(data1{i}, 1)
+    plot([(2*(i-1) + 2*(i-1))...
+          2*(i-1) + 1 + 2*(i-1)], ...
+          [data1{i}(j, 2) data2{i}(j, 2)],'k--');hold on
+    end
+end
+
+ylabel('a*');
+aa = 1:length(cci_control);
+num_xticks = sort([2*(aa-1)+2*(aa-1) 2*(aa-1)+2*(aa-1)+1]); 
+xticks(num_xticks)
+xticklabels(condition_names)
+axis([2*(aa(1)-1)+2*(aa(1)-1)-1 2*(aa(end)-1)+2*(aa(end)-1)+2 ...
+    -1 3])
+set(gca, 'FontSize', 30, 'FontName','L M Roman10');
 

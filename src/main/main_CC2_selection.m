@@ -12,7 +12,7 @@ folder = 'Data/CC2/selection_cubes_neutral_yellow/';
 subdir = dir(folder);
 
 calibration_file = ['/home/raquel/Documents/repositories/'...
-    'CC2-main/rsrc/results_ColorCharacterization/'...
+    'COCO/rsrc/results_ColorCharacterization/'...
     'colorcharacteriation_mat/'...
     'Calib_UnrealStandard521_Varjo_13_06_2024_4_LUT_dE.mat'];
 
@@ -20,7 +20,7 @@ num_sessions =   1.*ones(7,1);
 N = 5;                                                                     % num of competitors
 competitorIndices = nchoosek(1:N, 2);
 lab_111 = 1;                                                               % convert to LAB using default Matlab -1- or the actual calibration -0-
-cci_space = 'Lab';                                                         % compute CCI in 'Lab' coordinates or only chromaticity coordinates AB
+cci_space = 'ab';                                                         % compute CCI in 'Lab' coordinates or only chromaticity coordinates AB
 saveFig = [];
 show = 1;                                                                  % set to 1 for plotting figures
 C = 100;                                                                   % size of the scatter

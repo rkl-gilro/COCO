@@ -1,5 +1,7 @@
-tests = convertCharsToStrings({'testing_cubes_Lab.mat', 'testing_spheres_Lab.mat', ...
-'testing_adj1_Lab.mat','testing_adj3_Lab.mat','testing_matching_Lab.mat'});
+tests = convertCharsToStrings({'testing_cubes_Lab.mat', ...
+    'testing_spheres_Lab.mat', ...
+    'testing_adj1_Lab.mat','testing_adj3_Lab.mat',...
+    'testing_matching_Lab.mat'});
 ymax = 0;
 for i=1:length(tests)
     aux = load(tests{i});
@@ -14,18 +16,21 @@ c(:, 5, :) = repmat([30,144,255]./255, K, 1);
 c(:, 3, :) = repmat([46,139,87]./255, K, 1);
 c(:, 2, :) = repmat([218,165,32]./255, K, 1);
 c(:, 4, :) = repmat([205,92,92]./255, K, 1);
-c(:, 1, :) = repmat([103,58,183]./255, K, 1);
+c(:, 1, :) = repmat([98 149 160]./255, K, 1);
 
 colors(:, :, 1) = c(:, :, 1);
 colors(:, :, 2) = c(:, :, 2);
 colors(:, :, 3) = c(:, :, 3);
 
-figure;h = daviolinplot_color(results,'colors',colors,...
+figure;
+plot([xl(1)-0.1, xl(2)+0.2], [1 1], 'k--', 'LineWidth',3);hold on
+h = daviolinplot_color(results,'colors',colors,...
     'box',3,'boxcolor','w','scatter',2,'jitter',0,'scattercolor','same',...
-'smoothing', .1,'boxspacing',1,'scattersize',220,'scatteralpha',0.7);
+'smoothing', .1,'boxspacing',1,'scattersize',520,'scatteralpha',0.7);
 xl = xlim; xlim([xl(1)-0.1, xl(2)+0.2]);
 ylim([0, ymax+0.3]);
-plot([xl(1)-0.1, xl(2)+0.2], [1 1], 'k--', 'LineWidth',3);
+
+set(gca, 'FontSize', 20, 'fontname','L M Roman10');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%

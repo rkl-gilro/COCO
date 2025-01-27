@@ -52,6 +52,8 @@ experiment_all = [];
 illuminants_all = [];
 illuminants_all_rgb = [];
 colorshifts_all = [];
+colorshifts_control_all = [];
+colorshifts_localsurround_all = [];
 neighbor_all = [];
 
 experiments_ill = [0.2316 0.2833 0.4579; %blue
@@ -59,6 +61,7 @@ experiments_ill = [0.2316 0.2833 0.4579; %blue
     0.233 0.3 0.2003;  %green
     0.4152 0.2114 0.3961]; %red
 %    0.2912 0.2705 0.2614; %neutral
+experiments_ill_name = {"Blue", "Yellow", "Green", "Red"};
 
 %% Plot the local surround CCI and the control %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 condition_names = local;
@@ -72,7 +75,7 @@ c = [189,183,107;
 
 for i=1:length(cci_surround)
     % data1{i} = mean(cci_surround{i}.CCI.cci_neutral(:, 2:end)', 2);
-    aux = cci_surround{i}.CCI.cci_neutral(:, 2:end);
+    aux = cci_surround{i}.CCI.cci(:, 2:end);
     data1{i} = aux(:);
 end
 
@@ -87,9 +90,31 @@ set(gca, 'FontSize', 20, 'fontname','L M Roman10');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+for i=1:size(colors_rgb_ls,1)
+    for j = 1:size(experiments_ill,1)
+        lab1 = rgb2lab(experiments_ill(j, :).*colors_rgb_ls(i,:), ...
+            'ColorSpace','linear-rgb','WhitePoint',[1 1 1]);
+        lab2 = rgb2lab(colors_rgb_ls(i,:), 'ColorSpace','linear-rgb',...
+            'WhitePoint',[1 1 1]);
+        % lab1(1) = lab2(1);
+        colorshift(i, j) = deltaE00(lab2', lab1');
+
+        num_part = size(cci_surround{i}.CCI.cci, 1);
+        match = ...
+            reshape(([cci_surround{i}.coloredMatch_reflected{:, j+1}]), ...
+            [], num_part);
+
+        colorshift_control{i, j} = ...
+            deltaE00(match, repmat(lab1', 1, num_part));
+        colorshift_localsurround{i, j} = ...
+            deltaE00(match, repmat(lab2', 1, num_part));
+
+    end
+end
+
 %% Define table for statistical analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for i = 1:length(cci_surround)
-    aux = cci_surround{i}.CCI.cci_neutral(:, 2:end);
+    aux = cci_surround{i}.CCI.cci(:, 2:end);
     aux2 = cci_surround{i}.Part_names;
     aux_part = size(aux, 1);
     aux_ill = [repmat("Blue",aux_part,1);repmat("Yellow",aux_part,1);...
@@ -110,6 +135,12 @@ for i = 1:length(cci_surround)
     reflectance_lab = rgb2lab(colors_rgb_ls(i, :), 'ColorSpace',...
         'linear-rgb','WhitePoint',[1 1 1]);
     
+    colorshifts_control_all = [colorshifts_control_all; ...
+        [colorshift_control{i, :}]'];
+
+    colorshifts_localsurround_all = [colorshifts_localsurround_all; ...
+        [colorshift_localsurround{i, :}]'];
+
     deltaerror = deltaE00(repmat(reflectance_lab, ...
         size(reflected_lab,1), 1)', reflected_lab');
     aux_shift = [repmat(deltaerror(1),aux_part,1);...
@@ -148,10 +179,11 @@ end
 
 tablenames = ...
     {'CCI', 'Participant', 'LocalSurround', 'Illuminant', 'Direction',...
-    'ColorShift'};
+    'ColorShift', 'ColorShiftControl', 'ColorShiftLS'};
 tbl = table(cci_all, ...
     participants_all, experiment_all, ...
     illuminants_all, neighbor_all,colorshifts_all,...
+    colorshifts_control_all, colorshifts_localsurround_all, ...
     'VariableNames', tablenames);
 
 tbl.LocalSurround = nominal(tbl.LocalSurround);
@@ -234,3 +266,18 @@ figure;h2 = daviolinplot(data2,'colors',c2,'box',3,...
 ylim([0 1.2])
 xl = xlim; xlim([xl(1)-0.1, xl(2)+0.2]);
 set(gca, 'FontSize', 20, 'fontname','L M Roman10');
+
+
+figure;
+for i=1:length(local)
+    aa = find(tbl.LocalSurround == local{i});
+    scatter3(tbl.ColorShift(aa), tbl.ColorShiftLS(aa), ...
+        tbl.ColorShiftControl(aa), 300, colors_rgb_ls(i, :).^.45, 'filled');hold on
+end
+
+figure;
+for i=1:length(experiments_ill_name)
+    aa = find(tbl.Illuminant == experiments_ill_name{i});
+    scatter3(tbl.ColorShift(aa), tbl.ColorShiftLS(aa), ...
+        tbl.ColorShiftControl(aa), 300, experiments_ill(i, :).^.45, 'filled');hold on
+end

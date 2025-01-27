@@ -8,7 +8,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear
 folder0 = 'Data/CC2/';                                       % folder where the competitors are stored
-folder = 'Data/CC2/adjustment_control_3/';
+folder = 'Data/CC2/matching_control/';
 subdir = dir(folder);
 
 calibration_file = ['/home/raquel/Documents/repositories/'...
@@ -20,15 +20,15 @@ num_sessions =   1.*ones(7,1);
 N = 5;                                                                     % num of competitors
 competitorIndices = nchoosek(1:N, 2);
 lab_111 = 1;                                                               % convert to LAB using default Matlab -1- or the actual calibration -0-
-cci_space = 'Lab';                                                         % compute CCI in 'Lab' coordinates or only chromaticity coordinates AB
+cci_space = 'ab';                                                         % compute CCI in 'Lab' coordinates or only chromaticity coordinates AB
 saveFig = [];
 show = 1;                                                                  % set to 1 for plotting figures
 C = 100;                                                                   % size of the scatter
-save_file_name = strcat('testing_adj3_', cci_space,'.mat');
+save_file_name = strcat('testing_matching_', cci_space,'.mat');
 
 %% Neutral, blue, Yellow, Green and Red
-experiments_pos = {'02_Neutral-Yellow-adjustment3-Control',...             
-    '02_Neutral-Yellow-adjustment3'};    
+experiments_pos = {'02_Neutral-Yellow-matching-Control',...             
+    '02_Neutral-Yellow-matching'};    
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define the illuminants
