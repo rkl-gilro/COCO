@@ -64,7 +64,7 @@ c = [189,183,107;
 
 for i=1:length(cci_surround)
     % data1{i} = mean(cci_surround{i}.CCI.cci_neutral(:, 2:end)', 2);
-    aux = cci_surround{i}.CCI.cci_neutral(:, 2:end);
+    aux = cci_surround{i}.CCI.ccip_neutral(:, 2:end);
     obs = cell2mat(cci_surround{i}.Part_names);
 
     obs_ = sum(str2num(obs(:, end-1:end)), 2)+1;
@@ -73,7 +73,7 @@ for i=1:length(cci_surround)
     data1_all{i} = aux;
     data1_mean{i} = mean(aux, 2);
 
-    aux2 = cci_control{i}.CCI.cci_neutral(:, 2:end);
+    aux2 = cci_control{i}.CCI.ccip_neutral(:, 2:end);
     data1_con{i} = aux2(:);
     data1_con_all{i} = aux2;
     data1_con_mean{i} = mean(aux2, 2);
@@ -118,6 +118,9 @@ for i=1:length(cci_surround)
     data1_rel_meanv(obs_,i) = median(aux3, 2); 
     data1_con_rel_meanv(obs_,i) = median(aux4, 2);
 
+    data1_rel_meanv(data1_rel_meanv == 0) = NaN;
+    data1_rel_meanv_cell{i} = data1_rel_meanv(:,i);
+
 end
 
 % for i=1:length(cci_surround)
@@ -131,18 +134,19 @@ end
 %     data1_con_rel_mean{i} = mean(aux2, 2);
 % end
 figure;
-plot(0:6, ones(1, 7), 'k--','LineWidth',3);hold on
-h = daboxplot(data1_relative,'xtlabels', condition_names,'whiskers',0,...
+plot(0:6, zeros(1, 7), 'k--','LineWidth',3);hold on
+h = daboxplot(data1_rel_meanv_cell,'xtlabels', condition_names,'whiskers',0,...
 'scatter',1,'scattersize',250,'scatteralpha',0.6,'outliers',0,...
-'colors', c,'linkline',1); % experiments_ill.^.45
+'colors', c,'linkline',1, 'withinline', 1); % experiments_ill.^.45
 set(gca, 'FontSize', 40, 'fontname','L M Roman10');
 ylim([-0.4 .4])
 yticks([-.5 0 1.2])
+ylabel('Absolute error (\Delta AE)')
 
 figure;
 plot(0:6, zeros(1, 7), 'k--','LineWidth',3);hold on
 h = dabarplot(data1_relative,'xtlabels', condition_names,...
-'colors',c,'errorbars','SE','numbers',1,'round',3, 'scattersize', 40);
+'colors',c,'errorbars','IQR','numbers',1,'round',3, 'scattersize', 40);
 set(gca, 'FontSize', 40, 'fontname','L M Roman10');
 ylim([-0.3 .2])
 yticks([-.3 -.2 -.1 0 .1 .2])
@@ -174,17 +178,17 @@ set(gca, 'FontSize', 50, 'fontname','L M Roman10');
 
 %% Define table for statistical analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for i = 1:length(cci_surround)
-    aux = [cci_surround{i}.CCI.cci_neutral(:, 2:end); ...
-           cci_control{i}.CCI.cci_neutral(:, 2:end)];
+    aux = [cci_surround{i}.CCI.ccip_neutral(:, 2:end); ...
+           cci_control{i}.CCI.ccip_neutral(:, 2:end)];
 
 
     aux2 = [(cci_surround{i}.Part_names);
             cci_control{i}.Part_names];
     
-    size_aux = cci_surround{i}.CCI.cci_neutral(:, 2:end);
+    size_aux = cci_surround{i}.CCI.ccip_neutral(:, 2:end);
     aux_part = size(size_aux, 1);
 
-    size_aux2 = cci_control{i}.CCI.cci_neutral(:, 2:end);
+    size_aux2 = cci_control{i}.CCI.ccip_neutral(:, 2:end);
     aux_part2 = size(size_aux2, 1);
 
 
@@ -257,22 +261,11 @@ tbl.Direction     = nominal(tbl.Direction);
 tbl.Baseline      = nominal(tbl.Baseline);
 
 %% Statistical analysis based on the direction: Neighboring, Opposing
-lme{1} = fitlme(tbl, 'CCI ~ 1 + Direction + (Direction|Participant)');
-lme{2} = fitlme(tbl, 'CCI ~ 1 + Direction + (1|Participant)');             % Best
-lme{3} = fitlme(tbl, 'CCI ~ 1 + Direction + (Direction-1|Participant)');
-lme{4} = fitlme(tbl, ['CCI ~ 1 + Direction + (1 + LocalSurround|Participant)' ...
-    '+ (1 + Illuminant|Participant)']);
-lme{5} = fitlme(tbl, ['CCI ~ 1 + Direction + (1 + LocalSurround|Participant)' ...
-    '+ (1 + Illuminant|Participant) + (1+Direction|Participant)']);
+lme{1} = fitlme(tbl, 'CCI ~ 1 + Direction + (1|Participant)');  
+lme{2} = fitlme(tbl, 'CCI ~ 1 + Baseline + (1|Participant)');  
 
-glme{1} = fitglme(tbl, 'CCI ~ 1 + Direction + (Direction|Participant)');
-glme{2} = fitglme(tbl, 'CCI ~ 1 + Direction + (1|Participant)');
-glme{3} = fitglme(tbl, 'CCI ~ 1 + Direction + (Direction-1|Participant)');
-glme{4} = fitglme(tbl, ['CCI ~ 1 + Direction + (1 + LocalSurround|Participant)' ...
-'+ (1 + Illuminant|Participant)'], 'FitMethod', 'Laplace');
-glme{5} = fitglme(tbl, ['CCI ~ 1 + Direction + (1 + LocalSurround|Participant)' ...
-'+ (1 + Illuminant|Participant) + (1+Direction|Participant)'], ...
-'FitMethod', 'Laplace');
+glme{1} = fitglme(tbl, 'CCI ~ 1 + Direction + (1|Participant)');
+glme{2} = fitglme(tbl, 'CCI ~ 1 + Baseline + (1|Participant)'); 
 
 %% Plot the fitting of the models in a figure
 shapes = {'o', 'v'};
@@ -303,19 +296,11 @@ axis square
 %% Statistical analysis based on the local surround colour: 
 %% 
 lme_ls{1} = fitlme(tbl, ['CCI ~ 1 + LocalSurround + ' ...
-    '(LocalSurround|Participant)']);
-lme_ls{2} = fitlme(tbl, ['CCI ~ 1 + LocalSurround + ' ...
-    '(1|Participant)']);                                                   % Best compare(,)
-lme_ls{3} = fitlme(tbl, ['CCI ~ 1 + LocalSurround + ' ...
-    '(LocalSurround-1|Participant)']);
-lme_ls{4} = fitlme(tbl, ['CCI ~ 1 + LocalSurround + ' ...
-    '(1 + LocalSurround|Participant)' ...
-    '+ (1 + Illuminant|Participant)']);
-lme_ls{5} = fitlme(tbl, ['CCI ~ 1 + LocalSurround + ' ...
-    '(1 + LocalSurround|Participant)' ...
-    '+ (1 + Illuminant|Participant) + (1+Direction|Participant)']);
-lme_ls{6} = fitlme(tbl, ['CCI ~ 1 + LocalSurround + ' ...
-    '(1 + Illuminant|Participant) + (1+Direction|Participant)']);
+    '(1|Participant)']);  
+lme_ls{2} = fitlme(tbl, ['CCI ~ 1 + LocalSurround*Illuminant + ' ...
+    '(1|Participant)']); 
+lme_ls{3} = fitlme(tbl, ['CCI ~ 1 + Baseline*Illuminant + ' ...
+    'Baseline^2 + (1|Participant)']); 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plot CCI results based on the neighboring, opposing illuminants
@@ -435,12 +420,7 @@ for i=1:length(illuminants_names)
     count = count + 1;
 end
 
-% data3{1} = data2{1} - mean(data2{1});
-% data3{2} = data2{2} - mean(data2{2});
-% data3{3} = data2{3} - mean(data2{1}); % ./ mean(data2{1})
-% data3{4} = data2{4} - mean(data2{2});
-
-data5(:,1) = data3{3}; % ./ mean(data2{1})
+data5(:,1) = data3{3};
 data5(:,2) = data3{4};
 
 if relative
@@ -450,15 +430,15 @@ else
     data7(:,1) = -dnoneo + (opp);
     data7(:,2) = -dnonen + (neig);
 end
-% data5(:,3) = 1-(abs(data2{1} - mean(data2{1})));
 
 figure;
-plot(0:6, ones(1, 7), 'k--','LineWidth',3);hold on
+plot(0:6, zeros(1, 7), 'k--','LineWidth',3);hold on
 h = daboxplot(data7,'xtlabels', {"Opposing","Neighboring"},'whiskers',0,...
 'scatter',1,'scattersize',350,'scatteralpha',0.6,'withinlines',1,...
 'linkline',1,'outliers',0,'colors',c2);
 set(gca, 'FontSize', 30, 'fontname','L M Roman10');
 ylim([-.6 .6])
+ylabel('Absolute error (\Delta AE)')
 
 figure;h2 = daviolinplot(data2,'colors',c2,'box',1,...
 'boxcolor','w','scatter',2,'jitter',1,'scattercolor','same',...
