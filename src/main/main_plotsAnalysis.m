@@ -480,6 +480,12 @@ lme{2} = fitlme(tbl, 'CCI ~ 1 + Baseline + (1|Participant)');
 glme{1} = fitglme(tbl, 'CCI ~ 1 + Direction + (1|Participant)');
 glme{2} = fitglme(tbl, 'CCI ~ 1 + Baseline + (1|Participant)'); 
 
+lme_dir = anova(lme{1});
+lme_base = anova(lme{2});
+
+glme_dir = anova(glme{1});
+glme_base = anova(glme{2});
+
 %% Plot the fitting of the models in a figure
 shapes = {'o', 'v'};
 
@@ -512,7 +518,8 @@ lme_ls{1} = fitlme(tbl, ['CCI ~ 1 + LocalSurround + ' ...
     '(1|Participant)']);  
 lme_ls{2} = fitlme(tbl, ['CCI ~ 1 + LocalSurround*Illuminant + ' ...
     '(1|Participant)']); 
-
+anova(lme_ls{1})
+anova(lme_ls{2})
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plot CCI results based on the neighboring, opposing illuminants
 c2 = [125,125,155;

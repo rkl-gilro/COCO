@@ -1,0 +1,43 @@
+filePaths = {'Control_outdoor_ccipn_colored.csv', ...
+    'LocalSurround_outdoor_ccipn_colored.csv', ...
+    'Control_indoor_ccipn_colored.csv', ...
+    'LocalSurround_indoor_ccipn_colored.csv'};
+
+filePaths = {'LocalSurround_Control_outdoor_BRpn_colored.csv', ...
+    'LocalSurround_Control_indoor_BRpn_colored.csv'};
+
+data_BRpn = analyzeExperimentData_noControlShiftLS(filePaths,...
+    {'CCIdiff'},...
+    [], {'Baseline', 'Baseline'});
+% analyzeExperimentData_noControlShiftLS(filePaths, {'CCI'})
+
+filePaths = {'Control_outdoor_neutral.csv', ...
+    'LocalSurround_outdoor_neutral.csv', ...
+    'Control_indoor_neutral.csv', ...
+    'LocalSurround_indoor_neutral.csv'};
+
+analyzeExperimentData(filePaths, {'MatchPosition'})
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Indoor
+filePaths = {'Control_indoor_colored.csv', ...
+    'LocalSurround_indoor_colored.csv'};
+
+analyzeExperimentData(filePaths, {'CCI'})
+
+filePaths = {'Control_indoor_neutral.csv', ...
+    'LocalSurround_indoor_neutral.csv'};
+
+analyzeExperimentData(filePaths, {'MatchPosition'})
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Outdoor
+filePaths = {'Control_outdoor_colored.csv', ...
+    'LocalSurround_outdoor_colored.csv'};
+
+analyzeExperimentData(filePaths, {'CCI'})
+
+filePaths = {'Control_outdoor_neutral.csv', ...
+    'LocalSurround_outdoor_neutral.csv'};
+
+analyzeExperimentData(filePaths, {'MatchPosition'})
