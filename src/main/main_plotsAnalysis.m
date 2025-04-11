@@ -1,11 +1,11 @@
 clear
 % close all
 
-outdoor = 1;
+outdoor = 0;
 relative = 0;
 cond = 4;
 
-cci_method = 9; % 1-ccip, 2-ccip neutral, 3-BRp, 4-BRp neutral
+cci_method = 4; % 1-ccip, 2-ccip neutral, 3-BRp, 4-BRp neutral
 cci_method_name = {'ccip', 'ccipn', 'BRp', 'BRpn', 'karl',...
                    'cci', 'ccin', 'BR', 'BRn'};
 
@@ -187,7 +187,7 @@ plot(0:6, zeros(1, 7), 'k--','LineWidth',3);hold on
 h = daboxplot(data1_rel_meanv_cell,'xtlabels', condition_names,'whiskers',0,...
 'scatter',1,'scattersize',250,'scatteralpha',0.6,'outliers',0,...
 'colors', c,'linkline',1, 'withinline', 1); % experiments_ill.^.45
-set(gca, 'FontSize', 40, 'fontname','L M Roman10');
+set(gca, 'FontSize', 30, 'fontname','L M Roman10');
 ylim([-0.4 .4])
 yticks([-.5 0 1.2])
 ylabel('Absolute error (\Delta AE)')
@@ -207,21 +207,23 @@ bb(bb==0) = NaN;
 
 force = [median(aa,2,'omitnan') ...
     median(bb,2,'omitnan')];
-figure;
-h = daboxplot(force,'xtlabels', {'Control','LocalSurround'},'whiskers',0,...
-'scatter',1,'scattersize',250,'scatteralpha',0.6,'outliers',0,...
-'colors',[.7 .7 .6],'linkline',1,'withinlines', 1);
-set(gca, 'FontSize', 30, 'fontname','L M Roman10');
-ylim([-0.6 .5])
+% figure;
+% h = daboxplot(force,'xtlabels', {'Control','LocalSurround'},'whiskers',0,...
+% 'scatter',1,'scattersize',250,'scatteralpha',0.6,'outliers',0,...
+% 'colors',[.7 .7 .6],'linkline',1,'withinlines', 1);
+% set(gca, 'FontSize', 30, 'fontname','L M Roman10');
+% ylim([-0.6 .5])
 
-figure;h = daviolinplot(data1_rel_mean,'colors',c,'box',3,...
+figure;
+plot(0:6, zeros(1, 7), 'k--','LineWidth',3);hold on
+h = daviolinplot(data1_rel_mean,'colors',c,'box',3,...
 'boxcolor','w','scatter',2,'jitter',0,'scattercolor','same',...
 'smoothing', .1,'boxspacing',1.3, ...
-'scattersize',500,'scatteralpha',0.7,...
+'scattersize',400,'scatteralpha',0.7,...
 'xtlabels', condition_names,'linkline',1,'withinlines', 1);
-ylim([0.5 1.25])
+ylim([-0.6 .6])
 xl = xlim; xlim([xl(1)-0.1, xl(2)+0.2]);
-set(gca, 'FontSize', 50, 'fontname','L M Roman10');
+set(gca, 'FontSize', 30, 'fontname','L M Roman10');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define table for statistical analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -476,9 +478,15 @@ writetable(tbl_colored, strcat(save_table_filename, '_colored.csv'));
 %% Statistical analysis based on the direction: Neighboring, Opposing
 lme{1} = fitlme(tbl, 'CCI ~ 1 + Direction + (1|Participant)');  
 lme{2} = fitlme(tbl, 'CCI ~ 1 + Baseline + (1|Participant)');  
+lme{3} = fitlme(tbl, ['CCI ~ 1 + ' ...
+    'LocalSurround*Illuminant + (1|Participant)']); 
+% lme{4} = fitlme(tbl, ['CCI ~ 1 + ' ...
+%     'LocalSurround*Illuminant + Baseline + (1|Participant)']); 
 
 glme{1} = fitglme(tbl, 'CCI ~ 1 + Direction + (1|Participant)');
 glme{2} = fitglme(tbl, 'CCI ~ 1 + Baseline + (1|Participant)'); 
+glme{3} = fitglme(tbl, ['CCI ~ 1 + ' ...
+    'LocalSurround*Illuminant + (1|Participant)']); 
 
 lme_dir = anova(lme{1});
 lme_base = anova(lme{2});
@@ -514,12 +522,15 @@ axis square
 
 %% Statistical analysis based on the local surround colour: 
 %% 
-lme_ls{1} = fitlme(tbl, ['CCI ~ 1 + LocalSurround + ' ...
+lme_ls{1} = fitlme(tbl_colored, ['CCIdiff ~ 1 + LocalSurround + ' ...
     '(1|Participant)']);  
-lme_ls{2} = fitlme(tbl, ['CCI ~ 1 + LocalSurround*Illuminant + ' ...
+lme_ls{2} = fitlme(tbl_colored, ['CCI ~ 1 + LocalSurround + ' ...
     '(1|Participant)']); 
-anova(lme_ls{1})
-anova(lme_ls{2})
+ 
+ls_ccidiff = anova(lme_ls{1});
+ls_cci = anova(lme_ls{2});
+disp(ls_cci)
+disp(ls_ccidiff)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plot CCI results based on the neighboring, opposing illuminants
 c2 = [125,125,155;
@@ -582,12 +593,12 @@ for i=1:length(unique_part)
         c_ls = strcat('Control', ls);
 
         for k=1:length(illuminants_names)
-            if ~isempty(tbl.CCI(tbl.Baseline == 'Local Surround' & ...
+            if ~isempty(tbl.CCIdiff(tbl.Baseline == 'Suppression' & ...
                     tbl.LocalSurround == ls & ...
                     convertCharsToStrings(tbl.Participant) == unique_part(i, :) & ...
                     tbl.Illuminant == illuminants_names(k)))
 
-                all_ls(i, j, k) = tbl.CCI(tbl.Baseline == 'Local Surround' & ...
+                all_ls(i, j, k) = tbl.CCIdiff(tbl.Baseline == 'Suppression' & ...
                     tbl.LocalSurround == ls & ...
                     convertCharsToStrings(tbl.Participant) == unique_part(i, :) & ...
                     tbl.Illuminant == illuminants_names(k));
@@ -609,7 +620,37 @@ for i=1:length(unique_part)
     end
 
 end
+parti_local = nanmean(all_ls, 3);
+parti_control = nanmean(all_c_ls, 3);
+for i=1:length(unique_part)
+    for j=i+1:length(unique_part)
+        aux = corrcoef(parti_local(i, :), parti_local(j, :), ...
+            'rows', 'complete');
+        Cinter(i, j) = aux(1, 2);
+        Cinter(j, i) = aux(1, 2);
 
+        aux = corrcoef(parti_control(i, :), parti_control(j, :), ...
+            'rows', 'complete');
+        Cinter_c(i, j) = aux(1, 2);
+        Cinter_c(j, i) = aux(1, 2);
+    end
+end
+
+parti = nanmean(nanmean(all_ls, 3),2);
+parti_c = nanmean(nanmean(all_c_ls, 3),2);
+figure;
+plot(0:2, zeros(3, 1), '--k', 'LineWidth', 3);hold on
+h = daboxplot(parti,...
+    'xtlabels', {'Suppression'},'whiskers',0,...
+'scatter',1,'scattersize',350,'scatteralpha',0.6,'withinlines',1,...
+'linkline',1,'outliers',0,'colors',c);
+set(gca, 'FontSize', 30, 'fontname','L M Roman10');
+axis([0 2 -.2 .1])
+% h = daboxplot([parti parti_c],...
+%     'xtlabels', {'Suppression','Baseline'},'whiskers',0,...
+% 'scatter',1,'scattersize',350,'scatteralpha',0.6,'withinlines',1,...
+% 'linkline',1,'outliers',0,'colors',c);
+% set(gca, 'FontSize', 30, 'fontname','L M Roman10');
 
 figure;
 plot(0:6, ones(1, 7), 'k--','LineWidth',3);hold on
@@ -662,11 +703,11 @@ end
 
 figure;
 plot(0:6, zeros(1, 7), 'k--','LineWidth',3);hold on
-h = daboxplot(data7,'xtlabels', {"Opposing","Neighboring"},'whiskers',0,...
+h = daboxplot(data7,'xtlabels', {''},'whiskers',0,...
 'scatter',1,'scattersize',350,'scatteralpha',0.6,'withinlines',1,...
 'linkline',1,'outliers',0,'colors',c2);
-set(gca, 'FontSize', 30, 'fontname','L M Roman10');
-ylim([-.6 .6])
+set(gca, 'FontSize', 25, 'fontname','L M Roman10');
+ylim([-.5 .5])
 ylabel('Absolute error (\Delta AE)')
 
 % figure;h2 = daviolinplot(data2,'colors',c2,'box',1,...
